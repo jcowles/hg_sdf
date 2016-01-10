@@ -381,63 +381,78 @@ void hg_sdf_init() {
 
 // Version with variable exponent.
 // This is slow and does not produce correct distances, but allows for bulging of objects.
+#define fGDF_t(begin,end) float d = 0.; for (int i = begin; i <= end; ++i) {d += pow(abs(dot(p, GDFVectors[i])), e);} return pow(d, 1./e) - r;
+// Original method, not suitable for WebGL:
 float fGDF(vec3 p, float r, float e, int begin, int end) {
 	float d = 0.;
 	for (int i = begin; i <= end; ++i)
 		d += pow(abs(dot(p, GDFVectors[i])), e);
 	return pow(d, 1./e) - r;
 }
+float fGDF36(vec3 p, float r, float e) { fGDF_t(3,6) }
+float fGDF1318(vec3 p, float r, float e) { fGDF_t(13,18) }
+float fGDF318(vec3 p, float r, float e) { fGDF_t(3,18) }
+float fGDF312(vec3 p, float r, float e) { fGDF_t(3,12) }
+float fGDF06(vec3 p, float r, float e) { fGDF_t(0,6) }
+#undef fGDF_t
 
 // Version with without exponent, creates objects with sharp edges and flat faces
+#define fGDF_t(begin,end) float d = 0.; for (int i = begin; i <= end; ++i){ d = max(d, abs(dot(p, GDFVectors[i])));} return d - r;
+// Original method, not suitable for WebGL:
 float fGDF(vec3 p, float r, int begin, int end) {
 	float d = 0.;
 	for (int i = begin; i <= end; ++i)
 		d = max(d, abs(dot(p, GDFVectors[i])));
 	return d - r;
 }
+float fGDF36(vec3 p, float r) { fGDF_t(3,6) }
+float fGDF1318(vec3 p, float r) { fGDF_t(13,18) }
+float fGDF318(vec3 p, float r) { fGDF_t(3,18) }
+float fGDF312(vec3 p, float r) { fGDF_t(3,12) }
+float fGDF06(vec3 p, float r) { fGDF_t(0,6) }
+#undef fGDF_t
 
 // Primitives follow:
 
 float fOctahedron(vec3 p, float r, float e) {
-	return fGDF(p, r, e, 3, 6);
+	return fGDF36(p, r, e);
 }
 
 float fDodecahedron(vec3 p, float r, float e) {
-	return fGDF(p, r, e, 13, 18);
+	return fGDF1318(p, r, e);
 }
 
 float fIcosahedron(vec3 p, float r, float e) {
-	return fGDF(p, r, e, 3, 12);
+	return fGDF312(p, r, e);
 }
 
 float fTruncatedOctahedron(vec3 p, float r, float e) {
-	return fGDF(p, r, e, 0, 6);
+	return fGDF06(p, r, e);
 }
 
 float fTruncatedIcosahedron(vec3 p, float r, float e) {
-	return fGDF(p, r, e, 3, 18);
+	return fGDF318(p, r, e);
 }
 
 float fOctahedron(vec3 p, float r) {
-	return fGDF(p, r, 3, 6);
+	return fGDF36(p, r);
 }
 
 float fDodecahedron(vec3 p, float r) {
-	return fGDF(p, r, 13, 18);
+	return fGDF1318(p, r);
 }
 
 float fIcosahedron(vec3 p, float r) {
-	return fGDF(p, r, 3, 12);
+	return fGDF312(p, r);
 }
 
 float fTruncatedOctahedron(vec3 p, float r) {
-	return fGDF(p, r, 0, 6);
+	return fGDF06(p, r);
 }
 
 float fTruncatedIcosahedron(vec3 p, float r) {
-	return fGDF(p, r, 3, 18);
+	return fGDF318(p, r);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
